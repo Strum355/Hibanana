@@ -5,16 +5,20 @@ public enum class TokenType(type: String) {
     EOF("EOF"),
     IDENT("IDENT"),
     INT("INT"),
+    FLOAT("FLOAT"),
+    STRING("STRING"),
     ASSIGN("="),
     ADDITION("+"),
     COMMA(","),
     SEMICOLON(";"),
+    COLON(":"),
     LPAREN(")"),
     RPAREN("("),
     LBRACE("}"),
     RBRACE("{"),
     FUNCTION("FUNCTION"),
-    VAR("VAR")
+    VAR("VAR"),
+    RETURN("RETURN")
 }
 
-public data class Token(val type: TokenType, val literal: Char)
+public data class Token(val type: TokenType, val text: String)

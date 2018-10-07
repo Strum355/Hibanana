@@ -21,21 +21,38 @@ public class Lexer constructor(val input: String, var position: Int = 0, var rea
     public fun nextToken(): Token {
         lateinit var tok: Token
         when(char) {
-            '=' -> tok = newToken(TokenType.ASSIGN, char)
-            ';' -> tok = newToken(TokenType.SEMICOLON, char)
-            '(' -> tok = newToken(TokenType.LPAREN, char)
-            ')' -> tok = newToken(TokenType.RPAREN, char)
-            ',' -> tok = newToken(TokenType.COMMA, char)
-            '+' -> tok = newToken(TokenType.ADDITION, char)
-            '{' -> tok = newToken(TokenType.LBRACE, char)
-            '}' -> tok = newToken(TokenType.RBRACE, char)
+            '=' -> tok = Token(TokenType.ASSIGN, char.toString())
+            ';' -> tok = Token(TokenType.SEMICOLON, char.toString())
+            '(' -> tok = Token(TokenType.LPAREN, char.toString())
+            ')' -> tok = Token(TokenType.RPAREN, char.toString())
+            ',' -> tok = Token(TokenType.COMMA, char.toString())
+            '+' -> tok = Token(TokenType.ADDITION, char.toString())
+            '{' -> tok = Token(TokenType.LBRACE, char.toString())
+            '}' -> tok = Token(TokenType.RBRACE, char.toString())
             0.toChar() -> {
-                tok = Token(TokenType.EOF, 0.toChar())
+                tok = Token(TokenType.EOF, 0.toString())
+            }
+            else -> {
+                if(Lexer.isLetter(char)) {
+                    return Token(TokenType.IDENT, readIdentifier())
+                } else {
+                    tok = Token(TokenType.ILLEGAL, char.toString())
+                }
             }
         }
         readChar()
         return tok
     }
 
-    private fun newToken(tokenType: TokenType, char: Char): Token = Token(tokenType, char)
+    private fun readIdentifier(): String {
+        val position = this.position
+        while(Lexer.isLetter(char)) readChar()
+        return input.slice(position..this.position)
+    }
+
+    companion object {
+        public fun isLetter(char: Char): Boolean {
+            return 'a' <= char && char <= 'z' || 'A' <= char && char <= 'Z' || char == '_' || char == '-'
+        }
+    }
 }
