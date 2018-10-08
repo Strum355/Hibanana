@@ -16,6 +16,14 @@ class TokenTest {
         func trolled(arg: int, otherArg: float): float {
             return 5 * 8 / otherArg + arg
         }
+
+        if 55 > 4 {
+            return false
+        } else if 55 != 4 {
+            return true
+        } else {
+            return 1
+        }
         """.trimIndent()
         
         val tests = arrayOf(
@@ -47,7 +55,30 @@ class TokenTest {
             TokenTest.ExpectedToken(TokenType.IDENT, "otherArg"),
             TokenTest.ExpectedToken(TokenType.PLUS, "+"),
             TokenTest.ExpectedToken(TokenType.IDENT, "arg"),
-            TokenTest.ExpectedToken(TokenType.RBRACE, "}")
+            TokenTest.ExpectedToken(TokenType.RBRACE, "}"),
+            TokenTest.ExpectedToken(TokenType.IF, "if"),
+            TokenTest.ExpectedToken(TokenType.INT, "55"),
+            TokenTest.ExpectedToken(TokenType.GT, ">"),
+            TokenTest.ExpectedToken(TokenType.INT, "4"),
+            TokenTest.ExpectedToken(TokenType.LBRACE, "{"),
+            TokenTest.ExpectedToken(TokenType.RETURN, "return"),
+            TokenTest.ExpectedToken(TokenType.FALSE, "false"),
+            TokenTest.ExpectedToken(TokenType.RBRACE, "}"),
+            TokenTest.ExpectedToken(TokenType.ELSE, "else"),
+            TokenTest.ExpectedToken(TokenType.IF, "if"),
+            TokenTest.ExpectedToken(TokenType.INT, "55"),
+            TokenTest.ExpectedToken(TokenType.NOT_EQUAL, "!="),
+            TokenTest.ExpectedToken(TokenType.INT, "4"),
+            TokenTest.ExpectedToken(TokenType.LBRACE, "{"),
+            TokenTest.ExpectedToken(TokenType.RETURN, "return"),
+            TokenTest.ExpectedToken(TokenType.TRUE, "true"),
+            TokenTest.ExpectedToken(TokenType.RBRACE, "}"),
+            TokenTest.ExpectedToken(TokenType.ELSE, "else"),
+            TokenTest.ExpectedToken(TokenType.LBRACE, "{"),
+            TokenTest.ExpectedToken(TokenType.RETURN, "return"),
+            TokenTest.ExpectedToken(TokenType.INT, "1"),
+            TokenTest.ExpectedToken(TokenType.RBRACE, "}"),
+            TokenTest.ExpectedToken(TokenType.EOF, 0.toChar().toString())
         )
 
         val lexed = Lexer(input)

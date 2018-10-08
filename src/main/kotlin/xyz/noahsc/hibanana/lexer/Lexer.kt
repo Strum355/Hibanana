@@ -1,7 +1,7 @@
 package xyz.noahsc.hibanana.lexer
 
-import xyz.noahsc.hibanana.token.Token
-import xyz.noahsc.hibanana.token.TokenType
+import xyz.noahsc.hibanana.token.*
+import java.util.Arrays
 
 public class Lexer constructor(val input: String, var position: Int = 0, var readPosition: Int = 0, var char: Char = 0.toChar()) {
     init {
@@ -9,50 +9,41 @@ public class Lexer constructor(val input: String, var position: Int = 0, var rea
     }
 
     private fun readChar() {
-        if (readPosition >= input.length) {
-            char = 0.toChar()
-        } else {
-            char = input.get(readPosition)
-        }
+        if (readPosition >= input.length) char = 0.toChar()
+        else char = input.get(readPosition)
         position = readPosition
         readPosition++
     }
 
     public fun nextToken(): Token {
-        lateinit var tok: Token
-
+        var tok: Token
+        
         jumpWhitespace()
 
         when(char) {
-            '=' -> tok = Token(TokenType.ASSIGN, char.toString())
+            '=' -> tok = createDualToken(TokenType.ASSIGN, char)
             ';' -> tok = Token(TokenType.SEMICOLON, char.toString())
             ':' -> tok = Token(TokenType.COLON, char.toString())
-            '!' -> tok = Token(TokenType.BANG, char.toString())
-            '+' -> tok = Token(TokenType.PLUS, char.toString())
-            '-' -> tok = Token(TokenType.DASH, char.toString())
-            '/' -> tok = Token(TokenType.FSLASH, char.toString())
-            '*' -> tok = Token(TokenType.ASTERISK, char.toString())
-            '<' -> tok = Token(TokenType.LT, char.toString())
-            '>' -> tok = Token(TokenType.GT, char.toString())
+            '!' -> tok = createDualToken(TokenType.BANG, char)
+            '+' -> tok = createDualToken(TokenType.PLUS, char)
+            '-' -> tok = createDualToken(TokenType.DASH, char)
+            '/' -> tok = createDualToken(TokenType.FSLASH, char)
+            '*' -> tok = createDualToken(TokenType.ASTERISK, char)
+            '<' -> tok = createDualToken(TokenType.LT, char)
+            '>' -> tok = createDualToken(TokenType.GT, char)
             '.' -> tok = Token(TokenType.PERIOD, char.toString())
             '(' -> tok = Token(TokenType.LPAREN, char.toString())
             ')' -> tok = Token(TokenType.RPAREN, char.toString())
             ',' -> tok = Token(TokenType.COMMA, char.toString())
             '{' -> tok = Token(TokenType.LBRACE, char.toString())
             '}' -> tok = Token(TokenType.RBRACE, char.toString())
-            0.toChar() -> tok = Token(TokenType.EOF, 0.toString())
+            0.toChar() -> tok = Token(TokenType.EOF, 0.toChar().toString())
             else -> {
                 if(Lexer.isIdentChar(char)) {
                     val ident = readIdentifier()
-                    when(ident) {
-                        "var" -> return Token(TokenType.VAR, ident)
-                        "func" -> return Token(TokenType.FUNCTION, ident)
-                        "return" -> return Token(TokenType.RETURN, ident)
-                    }
-                    return Token(TokenType.IDENT, ident)
+                    return Token(lookupIdent(ident), ident)
                 } else if(isDigit(char)) {
-                    val num = readNumber()
-                    return Token(TokenType.INT, num)
+                    return Token(TokenType.INT, readNumber())
                 } else {
                     tok = Token(TokenType.ILLEGAL, char.toString())
                 }
@@ -74,9 +65,25 @@ public class Lexer constructor(val input: String, var position: Int = 0, var rea
         return input.slice(position..this.position-1)
     }
 
+    private fun createDualToken(firstToken: TokenType, firstChar: Char): Token {
+        when(firstChar) {
+            '=', '<', '>', '!', '+', '*', '-', '/' -> {
+                if(peekChar() == '=') {
+                    var text = char.toString()
+                    readChar()
+                    text += char.toString()
+                    return Token(TokenType.get(text), text)
+                }
+            }
+        }
+        return Token(firstToken, firstChar.toString())
+    }
+
     private fun jumpWhitespace() {
         while(char == ' ' || char == '\n' || char == '\r') readChar()
     }
+
+    private fun peekChar(): Char = if(readPosition >= input.length) 0.toChar() else input.get(readPosition)
 
     companion object {
         public fun isIdentChar(char: Char): Boolean = 'a' <= char && char <= 'z' || 'A' <= char && char <= 'Z' || char == '_' || char == '-' 

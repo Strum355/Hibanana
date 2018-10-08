@@ -1,6 +1,6 @@
 package xyz.noahsc.hibanana.token
 
-public enum class TokenType(type: String) {
+public enum class TokenType(val type: String) {
     ILLEGAL("ILLEGAL"),
     EOF("EOF"),
     IDENT("IDENT"),
@@ -9,8 +9,21 @@ public enum class TokenType(type: String) {
     STRING("STRING"),
     FUNCTION("FUNCTION"),
     VAR("VAR"),
+    CONST("CONST"),
+    TRUE("TRUE"),
+    FALSE("FALSE"),
+    IF("IF"),
+    ELSE("ELSE"),
     RETURN("RETURN"),
     ASSIGN("="),
+    EQUAL("=="),
+    GT_EQUAL(">="),
+    LT_EQUAL("<="),
+    NOT_EQUAL("!="),
+    PLUS_EQUAL("+="),
+    ASTERISK_EQUAL("*="),
+    DASH_EQUAL("-="),
+    FLASH_EQUAL("/="),
     PLUS("+"),
     DASH("-"),
     ASTERISK("*"),
@@ -27,7 +40,33 @@ public enum class TokenType(type: String) {
     LPAREN(")"),
     RPAREN("("),
     LBRACE("}"),
-    RBRACE("{")
+    RBRACE("{");
+
+    companion object {
+        private val tokens: HashMap<String, TokenType> = HashMap()
+
+        init {
+            for(token in TokenType.values()) {
+                tokens.put(token.type, token)
+            }
+        }
+
+        public fun get(type: String): TokenType = this.tokens.getOrDefault(type, TokenType.ILLEGAL)
+    }
+}
+
+val keywords = mapOf(
+    "func" to TokenType.FUNCTION,
+    "var" to TokenType.VAR,
+    "true" to TokenType.TRUE,
+    "false" to TokenType.FALSE,
+    "if" to TokenType.IF,
+    "else" to TokenType.ELSE,
+    "return" to TokenType.RETURN
+)
+
+fun lookupIdent(ident: String): TokenType {
+    return keywords.getOrElse(ident, { TokenType.IDENT })
 }
 
 public data class Token(val type: TokenType, val text: String)
