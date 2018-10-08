@@ -7,18 +7,27 @@ public enum class TokenType(type: String) {
     INT("INT"),
     FLOAT("FLOAT"),
     STRING("STRING"),
+    FUNCTION("FUNCTION"),
+    VAR("VAR"),
+    RETURN("RETURN"),
     ASSIGN("="),
-    ADDITION("+"),
+    PLUS("+"),
+    DASH("-"),
+    ASTERISK("*"),
+    FSLASH("/"),
+    BSLASH("\\"),
+    GT(">"),
+    LT("<"),
+    BANG("!"),
+    QUESTION("?"),
     COMMA(","),
+    PERIOD("."),
     SEMICOLON(";"),
     COLON(":"),
     LPAREN(")"),
     RPAREN("("),
     LBRACE("}"),
-    RBRACE("{"),
-    FUNCTION("FUNCTION"),
-    VAR("VAR"),
-    RETURN("RETURN")
+    RBRACE("{")
 }
 
 public data class Token(val type: TokenType, val text: String)

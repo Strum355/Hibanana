@@ -13,8 +13,8 @@ class TokenTest {
         val input = """
         var x: int = 5
         
-        func trolled(arg: string, otherArg: float): int {
-            return 5
+        func trolled(arg: int, otherArg: float): float {
+            return 5 * 8 / otherArg + arg
         }
         """.trimIndent()
         
@@ -30,17 +30,23 @@ class TokenTest {
             TokenTest.ExpectedToken(TokenType.LPAREN, "("),
             TokenTest.ExpectedToken(TokenType.IDENT, "arg"),
             TokenTest.ExpectedToken(TokenType.COLON, ":"),
-            TokenTest.ExpectedToken(TokenType.IDENT, "string"),
+            TokenTest.ExpectedToken(TokenType.IDENT, "int"),
             TokenTest.ExpectedToken(TokenType.COMMA, ","),
             TokenTest.ExpectedToken(TokenType.IDENT, "otherArg"),
             TokenTest.ExpectedToken(TokenType.COLON, ":"),
             TokenTest.ExpectedToken(TokenType.IDENT, "float"),
             TokenTest.ExpectedToken(TokenType.RPAREN, ")"),
             TokenTest.ExpectedToken(TokenType.COLON, ":"),
-            TokenTest.ExpectedToken(TokenType.IDENT, "int"),
+            TokenTest.ExpectedToken(TokenType.IDENT, "float"),
             TokenTest.ExpectedToken(TokenType.LBRACE, "{"),
             TokenTest.ExpectedToken(TokenType.RETURN, "return"),
             TokenTest.ExpectedToken(TokenType.INT, "5"),
+            TokenTest.ExpectedToken(TokenType.ASTERISK, "*"),
+            TokenTest.ExpectedToken(TokenType.INT, "8"),
+            TokenTest.ExpectedToken(TokenType.FSLASH, "/"),
+            TokenTest.ExpectedToken(TokenType.IDENT, "otherArg"),
+            TokenTest.ExpectedToken(TokenType.PLUS, "+"),
+            TokenTest.ExpectedToken(TokenType.IDENT, "arg"),
             TokenTest.ExpectedToken(TokenType.RBRACE, "}")
         )
 
