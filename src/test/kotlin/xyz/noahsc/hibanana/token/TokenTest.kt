@@ -12,6 +12,8 @@ class TokenTest {
     fun testNextToken() {
         val input = """
         var x: int = 5
+
+        mut var y: int = 10
         
         func trolled(arg: int, otherArg: float): float {
             return 5 * 8 / otherArg + arg
@@ -33,6 +35,13 @@ class TokenTest {
             TokenTest.ExpectedToken(TokenType.IDENT, "int"),
             TokenTest.ExpectedToken(TokenType.ASSIGN, "="),
             TokenTest.ExpectedToken(TokenType.INT, "5"),
+            TokenTest.ExpectedToken(TokenType.IDENT, "mut"),
+            TokenTest.ExpectedToken(TokenType.VAR, "var"),
+            TokenTest.ExpectedToken(TokenType.IDENT, "y"),
+            TokenTest.ExpectedToken(TokenType.COLON, ":"),
+            TokenTest.ExpectedToken(TokenType.IDENT, "int"),
+            TokenTest.ExpectedToken(TokenType.ASSIGN, "="),
+            TokenTest.ExpectedToken(TokenType.INT, "10"),
             TokenTest.ExpectedToken(TokenType.FUNCTION, "func"),
             TokenTest.ExpectedToken(TokenType.IDENT, "trolled"),
             TokenTest.ExpectedToken(TokenType.LPAREN, "("),
@@ -85,7 +94,7 @@ class TokenTest {
         
         tests.forEachIndexed { _, it ->
             val token = lexed.nextToken()
-            println("${token.type.toString()} ${token.text} ${it.expectedType} ${it.expectedString}")
+            //println("${token.type.toString()} ${token.text} ${it.expectedType} ${it.expectedString}")
             assertEquals(token.type, it.expectedType)
             assertEquals(token.text, it.expectedString)
         }

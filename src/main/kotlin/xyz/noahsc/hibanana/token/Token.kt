@@ -9,7 +9,7 @@ public enum class TokenType(val type: String) {
     STRING("STRING"),
     FUNCTION("FUNCTION"),
     VAR("VAR"),
-    CONST("CONST"),
+    MUT("MUT")
     TRUE("TRUE"),
     FALSE("FALSE"),
     IF("IF"),

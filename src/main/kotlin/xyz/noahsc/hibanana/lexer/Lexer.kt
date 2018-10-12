@@ -3,7 +3,11 @@ package xyz.noahsc.hibanana.lexer
 import xyz.noahsc.hibanana.token.*
 import java.util.Arrays
 
-public class Lexer constructor(val input: String, var position: Int = 0, var readPosition: Int = 0, var char: Char = 0.toChar()) {
+public class Lexer constructor(private val input: String) {
+    private var position = 0
+    private var readPosition = 0
+    private var char: Char = 0.toChar()
+
     init {
         readChar()
     }
