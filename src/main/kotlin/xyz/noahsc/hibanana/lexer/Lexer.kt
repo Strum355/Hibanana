@@ -25,10 +25,10 @@ public class Lexer constructor(private val input: String) {
         jumpWhitespace()
 
         when(char) {
-            '=' -> tok = createDualToken(TokenType.ASSIGN, char)
+            '\n' -> tok = Token(TokenType.NEWLINE, char.toString())
             ';' -> tok = Token(TokenType.SEMICOLON, char.toString())
             ':' -> tok = Token(TokenType.COLON, char.toString())
-            '!', '+', '-', '/', '*', '<', '>' -> tok = createDualToken(TokenType.get(char.toString()), char)
+            '=', '!', '+', '-', '/', '*', '<', '>' -> tok = createDualToken(TokenType.get(char.toString()), char)
             '.' -> tok = Token(TokenType.PERIOD, char.toString())
             '(' -> tok = Token(TokenType.LPAREN, char.toString())
             ')' -> tok = Token(TokenType.RPAREN, char.toString())
@@ -78,7 +78,7 @@ public class Lexer constructor(private val input: String) {
     }
 
     private fun jumpWhitespace() {
-        while(char == ' ' || char == '\n' || char == '\r') readChar()
+        while(char == ' ' || char == '\r' || char == '\t') readChar()
     }
 
     private fun peekChar(): Char = if(readPosition >= input.length) 0.toChar() else input.get(readPosition)

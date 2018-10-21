@@ -35,6 +35,8 @@ class TokenTest {
             TokenTest.ExpectedToken(TokenType.IDENT, "int"),
             TokenTest.ExpectedToken(TokenType.ASSIGN, "="),
             TokenTest.ExpectedToken(TokenType.INT, "5"),
+            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
+            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
             TokenTest.ExpectedToken(TokenType.IDENT, "mut"),
             TokenTest.ExpectedToken(TokenType.VAR, "var"),
             TokenTest.ExpectedToken(TokenType.IDENT, "y"),
@@ -42,6 +44,8 @@ class TokenTest {
             TokenTest.ExpectedToken(TokenType.IDENT, "int"),
             TokenTest.ExpectedToken(TokenType.ASSIGN, "="),
             TokenTest.ExpectedToken(TokenType.INT, "10"),
+            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
+            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
             TokenTest.ExpectedToken(TokenType.FUNCTION, "func"),
             TokenTest.ExpectedToken(TokenType.IDENT, "trolled"),
             TokenTest.ExpectedToken(TokenType.LPAREN, "("),
@@ -56,6 +60,7 @@ class TokenTest {
             TokenTest.ExpectedToken(TokenType.COLON, ":"),
             TokenTest.ExpectedToken(TokenType.IDENT, "float"),
             TokenTest.ExpectedToken(TokenType.LBRACE, "{"),
+            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
             TokenTest.ExpectedToken(TokenType.RETURN, "return"),
             TokenTest.ExpectedToken(TokenType.INT, "5"),
             TokenTest.ExpectedToken(TokenType.ASTERISK, "*"),
@@ -64,14 +69,19 @@ class TokenTest {
             TokenTest.ExpectedToken(TokenType.IDENT, "otherArg"),
             TokenTest.ExpectedToken(TokenType.PLUS, "+"),
             TokenTest.ExpectedToken(TokenType.IDENT, "arg"),
+            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
             TokenTest.ExpectedToken(TokenType.RBRACE, "}"),
+            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
+            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
             TokenTest.ExpectedToken(TokenType.IF, "if"),
             TokenTest.ExpectedToken(TokenType.INT, "55"),
             TokenTest.ExpectedToken(TokenType.GT, ">"),
             TokenTest.ExpectedToken(TokenType.INT, "4"),
             TokenTest.ExpectedToken(TokenType.LBRACE, "{"),
+            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
             TokenTest.ExpectedToken(TokenType.RETURN, "return"),
             TokenTest.ExpectedToken(TokenType.FALSE, "false"),
+            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
             TokenTest.ExpectedToken(TokenType.RBRACE, "}"),
             TokenTest.ExpectedToken(TokenType.ELSE, "else"),
             TokenTest.ExpectedToken(TokenType.IF, "if"),
@@ -79,13 +89,17 @@ class TokenTest {
             TokenTest.ExpectedToken(TokenType.NOT_EQUAL, "!="),
             TokenTest.ExpectedToken(TokenType.INT, "4"),
             TokenTest.ExpectedToken(TokenType.LBRACE, "{"),
+            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
             TokenTest.ExpectedToken(TokenType.RETURN, "return"),
             TokenTest.ExpectedToken(TokenType.TRUE, "true"),
+            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
             TokenTest.ExpectedToken(TokenType.RBRACE, "}"),
             TokenTest.ExpectedToken(TokenType.ELSE, "else"),
             TokenTest.ExpectedToken(TokenType.LBRACE, "{"),
+            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
             TokenTest.ExpectedToken(TokenType.RETURN, "return"),
             TokenTest.ExpectedToken(TokenType.INT, "1"),
+            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
             TokenTest.ExpectedToken(TokenType.RBRACE, "}"),
             TokenTest.ExpectedToken(TokenType.EOF, 0.toChar().toString())
         )
@@ -95,8 +109,8 @@ class TokenTest {
         tests.forEachIndexed { _, it ->
             val token = lexed.nextToken()
             //println("${token.type.toString()} ${token.text} ${it.expectedType} ${it.expectedString}")
-            assertEquals(token.type, it.expectedType)
-            assertEquals(token.text, it.expectedString)
+            assertEquals(it.expectedType, token.type)
+            assertEquals(it.expectedString, token.text)
         }
     }
 

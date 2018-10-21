@@ -21,6 +21,50 @@ public class Parser(private val lexer: Lexer) {
     }
 
     public fun parse(): Program? {
-        return null
+        val program = Program()
+        while(currToken.type != TokenType.EOF) {
+            val statement: Statement? = parseStatement()
+            if(statement != null) {
+                program.statements.add(statement)
+            }
+            nextToken()
+        }
+        return program
     }
+
+    private fun currTokenIs(t: TokenType) = currToken.type == t
+
+    private fun peekTokenIs(t: TokenType) = peekToken.type == t
+
+    private fun expectPeek(t: TokenType): Boolean {
+        if(peekTokenIs(t)) {
+            nextToken()
+            return true
+        }
+        return false
+    }
+
+    private fun parseStatement(): Statement? {
+        when(currToken.type) {
+            TokenType.VAR -> return parseVar()
+            else -> return null
+        }
+    }
+
+    private fun parseVar(): VarStatement? {
+        val firstToken = currToken
+
+        if(!expectPeek(TokenType.IDENT)) return null
+        
+        val ident = Identifier(currToken.text, currToken)
+
+        if(!expectPeek(TokenType.COLON) && !expectPeek(TokenType.IDENT) && !expectPeek(TokenType.ASSIGN)) return null
+
+        while(!currTokenIs(TokenType.NEWLINE) && !currTokenIs(TokenType.EOF)) {
+            nextToken()
+        }
+
+        return VarStatement(null, ident, firstToken)
+    }
+
 }

@@ -1,5 +1,23 @@
 package xyz.noahsc.hibanana.token
 
+import xyz.noahsc.hibanana.ast.*
+
+val keywords = mapOf(
+    "func" to TokenType.FUNCTION,
+    "var" to TokenType.VAR,
+    "true" to TokenType.TRUE,
+    "false" to TokenType.FALSE,
+    "if" to TokenType.IF,
+    "else" to TokenType.ELSE,
+    "return" to TokenType.RETURN
+)
+
+fun lookupIdent(ident: String): TokenType {
+    return keywords.getOrElse(ident, { TokenType.IDENT })
+}
+
+public data class Token(val type: TokenType, val text: String)
+
 public enum class TokenType(val type: String) {
     ILLEGAL("ILLEGAL"),
     EOF("EOF"),
@@ -9,7 +27,7 @@ public enum class TokenType(val type: String) {
     STRING("STRING"),
     FUNCTION("FUNCTION"),
     VAR("VAR"),
-    MUT("MUT")
+    MUT("MUT"),
     TRUE("TRUE"),
     FALSE("FALSE"),
     IF("IF"),
@@ -40,7 +58,8 @@ public enum class TokenType(val type: String) {
     LPAREN(")"),
     RPAREN("("),
     LBRACE("}"),
-    RBRACE("{");
+    RBRACE("{"),
+    NEWLINE("\n");
 
     companion object {
         private val tokens: HashMap<String, TokenType> = HashMap()
@@ -54,19 +73,3 @@ public enum class TokenType(val type: String) {
         public fun get(type: String): TokenType = this.tokens.getOrDefault(type, TokenType.ILLEGAL)
     }
 }
-
-val keywords = mapOf(
-    "func" to TokenType.FUNCTION,
-    "var" to TokenType.VAR,
-    "true" to TokenType.TRUE,
-    "false" to TokenType.FALSE,
-    "if" to TokenType.IF,
-    "else" to TokenType.ELSE,
-    "return" to TokenType.RETURN
-)
-
-fun lookupIdent(ident: String): TokenType {
-    return keywords.getOrElse(ident, { TokenType.IDENT })
-}
-
-public data class Token(val type: TokenType, val text: String)
