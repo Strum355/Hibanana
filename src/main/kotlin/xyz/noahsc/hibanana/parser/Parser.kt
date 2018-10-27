@@ -8,6 +8,7 @@ public class Parser(private val lexer: Lexer) {
     // Must be set to lateinit :(
     private lateinit var currToken: Token
     private var peekToken: Token
+    private val errors: ArrayList<String> = arrayListOf()
 
     init {
         peekToken = lexer.nextToken()
@@ -32,6 +33,8 @@ public class Parser(private val lexer: Lexer) {
         return program
     }
 
+    public fun getErrors() = errors.clone() as ArrayList<String>
+
     private fun currTokenIs(t: TokenType) = currToken.type == t
 
     private fun peekTokenIs(t: TokenType) = peekToken.type == t
@@ -41,14 +44,17 @@ public class Parser(private val lexer: Lexer) {
             nextToken()
             return true
         }
+        peekError(t)
         return false
     }
 
-    private fun parseStatement(): Statement? {
-        when(currToken.type) {
-            TokenType.VAR -> return parseVar()
-            else -> return null
-        }
+    private fun peekError(t: TokenType) {
+        errors.add("expected ${t.name}, got ${peekToken.type.name} instead")
+    }
+
+    private fun parseStatement() = when(currToken.type) {
+        TokenType.VAR -> parseVar()
+        else -> null
     }
 
     private fun parseVar(): VarStatement? {
@@ -60,11 +66,14 @@ public class Parser(private val lexer: Lexer) {
 
         if(!expectPeek(TokenType.COLON) && !expectPeek(TokenType.IDENT) && !expectPeek(TokenType.ASSIGN)) return null
 
-        while(!currTokenIs(TokenType.NEWLINE) && !currTokenIs(TokenType.EOF)) {
-            nextToken()
-        }
+        skipToEnd()
 
         return VarStatement(null, ident, firstToken)
     }
 
+    private fun skipToEnd() {
+        while(!currTokenIs(TokenType.NEWLINE) && !currTokenIs(TokenType.EOF) && !currTokenIs(TokenType.SEMICOLON)) {
+            nextToken()
+        }
+    }
 }

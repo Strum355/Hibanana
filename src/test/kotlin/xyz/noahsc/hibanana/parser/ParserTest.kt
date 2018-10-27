@@ -22,13 +22,25 @@ class ParserTest {
         assertNotNull("program must not be null", program)
 
         if(program != null) {
-            assertEquals("program must contain 2 statements", program.statements.size, 2)
+            assertEquals("program must contain 2 statements", 2, program.statements.size)
 
             val tests = arrayOf("x", "y")
             program.statements.withIndex().forEach { 
                 checkVar(it.value, tests[it.index])
             }
         }
+    }
+
+    @Test
+    fun testVarStatementFail() {
+        val input = """
+        var x: int = 5
+        var y int = 10
+        """.trimIndent()
+
+        val parser = Parser(Lexer(input))
+        parser.parse()
+        assertEquals("parser must have one error", 1, parser.getErrors().size)
     }
 
     fun checkVar(statement: Statement, name: String) {
