@@ -54,6 +54,7 @@ public class Parser(private val lexer: Lexer) {
 
     private fun parseStatement() = when(currToken.type) {
         TokenType.VAR -> parseVar()
+        TokenType.RETURN ->  parseReturn()
         else -> null
     }
 
@@ -69,6 +70,15 @@ public class Parser(private val lexer: Lexer) {
         skipToEnd()
 
         return VarStatement(null, ident, firstToken)
+    }
+
+    private fun parseReturn(): ReturnStatement? {
+        val firstToken = currToken
+
+        nextToken()
+        skipToEnd()
+
+        return ReturnStatement(null, firstToken)
     }
 
     private fun skipToEnd() {
