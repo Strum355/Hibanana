@@ -8,7 +8,7 @@ public class Parser(private val lexer: Lexer) {
     // Must be set to lateinit :(
     private lateinit var currToken: Token
     private var peekToken: Token
-    public val errors: ArrayList<String> = arrayListOf()
+    public val errors: ArrayList<ParserError> = arrayListOf()
 
     init {
         peekToken = lexer.nextToken()
@@ -46,7 +46,8 @@ public class Parser(private val lexer: Lexer) {
     }
 
     private fun peekError(t: TokenType) {
-        errors.add("expected ${t.name}, got ${peekToken.type.name} instead")
+        // TODO actual numbers
+        errors.add(ParserError(1, 1, 1, "expected ${t.name}, got ${peekToken.type.name} instead"))
     }
 
     private fun parseStatement() = when(currToken.type) {
