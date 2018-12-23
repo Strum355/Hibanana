@@ -8,13 +8,12 @@ public class Parser(private val lexer: Lexer) {
     // Must be set to lateinit :(
     private lateinit var currToken: Token
     private var peekToken: Token
-    private val errors: ArrayList<String> = arrayListOf()
+    public val errors: ArrayList<String> = arrayListOf()
 
     init {
         peekToken = lexer.nextToken()
         nextToken()
     }
-
 
     private fun nextToken() {
         currToken = peekToken
@@ -32,8 +31,6 @@ public class Parser(private val lexer: Lexer) {
         }
         return program
     }
-
-    public fun getErrors() = errors.clone() as ArrayList<String>
 
     private fun currTokenIs(t: TokenType) = currToken.type == t
 

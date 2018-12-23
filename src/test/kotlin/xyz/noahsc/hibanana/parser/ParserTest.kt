@@ -1,7 +1,7 @@
 package xyz.noahsc.hibanana.parser
 
-import org.junit.Test
-import org.junit.Assert.*
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions.*;
 import xyz.noahsc.hibanana.token.Token
 import xyz.noahsc.hibanana.token.TokenType
 import xyz.noahsc.hibanana.lexer.Lexer
@@ -17,12 +17,12 @@ class ParserTest {
         """.trimIndent()
 
         val parser = Parser(Lexer(input))
-
         val program = parser.parse()
-        assertNotNull("program must not be null", program)
+
+        assertNotNull(program)
         program!! // asserted null, no need for safe checks anymore, but compiler doesnt know that
 
-        assertEquals("program must contain 2 statements", 2, program.statements.size)
+        assertEquals(2, program.statements.size)
 
         val tests = arrayOf("x", "y")
         program.statements.withIndex().forEach { 
@@ -39,13 +39,13 @@ class ParserTest {
 
         val parser = Parser(Lexer(input))
         parser.parse()
-        assertEquals("parser must have one error", 1, parser.getErrors().size)
+        assertEquals(1, parser.errors.size)
     }
 
     fun checkVar(statement: Statement, name: String) {
-        assertEquals("token literally must be var", "var", statement.tokenLiteral())
-        assertTrue("statement must be a var statement", statement is VarStatement)
-        assertEquals("ident value must be $name", name, (statement as VarStatement).name.value)
+        assertEquals("var", statement.tokenLiteral())
+        assertTrue(statement is VarStatement)
+        assertEquals(name, (statement as VarStatement).name.value)
         assertEquals(name, statement.name.tokenLiteral())
     }
 
@@ -59,7 +59,7 @@ class ParserTest {
 
         val parser = Parser(Lexer(input))
         val program = parser.parse()!!
-        assertEquals("parser must have 3 statements", 3, program.statements.size)
+        assertEquals(3, program.statements.size)
 
         program.statements.forEach {
             assert(it is ReturnStatement, { "each statement must be a return statement" })

@@ -1,7 +1,7 @@
 package xyz.noahsc.hibanana.token
 
-import org.junit.Test
-import org.junit.Assert.assertEquals
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.Assertions.*;
 import xyz.noahsc.hibanana.token.Token
 import xyz.noahsc.hibanana.token.TokenType
 import xyz.noahsc.hibanana.lexer.Lexer
