@@ -1,49 +1,48 @@
 package xyz.noahsc.hibanana.lexer
 
 import xyz.noahsc.hibanana.token.*
-import java.util.Arrays
 
-public class Lexer(private val input: String) {
+class Lexer(private val input: String) {
     private var position = 0
     private var readPosition = 0
-    private var char: Char = 0.toChar()
+    private var char: Char = Char.MIN_VALUE
 
     init {
         readChar()
     }
 
     private fun readChar() {
-        if (readPosition >= input.length) char = 0.toChar()
-        else char = input.get(readPosition)
+        char = if (readPosition >= input.length) 0.toChar()
+        else input[readPosition]
         position = readPosition
         readPosition++
     }
 
-    public fun nextToken(): Token {
-        var tok: Token
-        
+    fun nextToken(): Token {
+        val tok: Token
+
         jumpWhitespace()
 
         when(char) {
-            '\n' -> tok = Token(TokenType.NEWLINE, char.toString())
-            ';' -> tok = Token(TokenType.SEMICOLON, char.toString())
-            ':' -> tok = Token(TokenType.COLON, char.toString())
-            '=', '!', '+', '-', '/', '*', '<', '>' -> tok = createDualToken(TokenType.get(char.toString()), char)
-            '.' -> tok = Token(TokenType.PERIOD, char.toString())
-            '(' -> tok = Token(TokenType.LPAREN, char.toString())
-            ')' -> tok = Token(TokenType.RPAREN, char.toString())
-            ',' -> tok = Token(TokenType.COMMA, char.toString())
-            '{' -> tok = Token(TokenType.LBRACE, char.toString())
-            '}' -> tok = Token(TokenType.RBRACE, char.toString())
-            0.toChar() -> tok = Token(TokenType.EOF, 0.toChar().toString())
+            '\n' -> tok = Newline
+            ';' -> tok = Semicolon
+            ':' -> tok = Colon
+            '=', '!', '+', '-', '/', '*', '<', '>' -> tok = compoundOrSingleOperator()
+            '.' -> tok = Dot
+            '(' -> tok = LeftParen
+            ')' -> tok = RightParen
+            ',' -> tok = Comma
+            '{' -> tok = LeftBrace
+            '}' -> tok = RightBrace
+            Char.MIN_VALUE -> tok = EOF
             else -> {
-                if(Lexer.isIdentChar(char)) {
+                if(isIdentChar(char)) {
                     val ident = readIdentifier()
-                    return Token(lookupIdent(ident), ident)
+                    return TokenWithText.getKeywordOrIdent(ident)
                 } else if(isDigit(char)) {
-                    return Token(TokenType.INT, readNumber())
+                    return Number(readNumber())
                 } else {
-                    tok = Token(TokenType.ILLEGAL, char.toString())
+                    tok = Illegal(char.toString())
                 }
             }
         }
@@ -53,39 +52,35 @@ public class Lexer(private val input: String) {
 
     private fun readIdentifier(): String {
         val position = this.position
-        while(Lexer.isIdentChar(char)) readChar()
-        return input.slice(position..this.position-1)
+        while(isIdentChar(char)) readChar()
+        return input.slice(position until this.position)
     }
 
     private fun readNumber(): String {
         val position = this.position
-        while(Lexer.isDigit(char)) readChar()
-        return input.slice(position..this.position-1)
+        while(isDigit(char)) readChar()
+        return input.slice(position until this.position)
     }
 
-    private fun createDualToken(firstToken: TokenType, firstChar: Char): Token {
-        when(firstChar) {
-            '=', '<', '>', '!', '+', '*', '-', '/' -> {
-                if(peekChar() == '=') {
-                    var text = char.toString()
-                    readChar()
-                    text += char.toString()
-                    return Token(TokenType.get(text), text)
-                }
-            }
+    private fun compoundOrSingleOperator(): Token {
+        if(peekChar() == '=') {
+            var lexemes = char.toString()
+            readChar()
+            lexemes += char.toString()
+            return CompoundOperator.getOrIllegal(lexemes)
         }
-        return Token(firstToken, firstChar.toString())
+        return SingularOperator.getOrIllegal(char)
     }
 
     private fun jumpWhitespace() {
         while(char == ' ' || char == '\r' || char == '\t') readChar()
     }
 
-    private fun peekChar(): Char = if(readPosition >= input.length) 0.toChar() else input.get(readPosition)
+    private fun peekChar(): Char = if(readPosition >= input.length) 0.toChar() else input[readPosition]
 
     companion object {
-        public fun isIdentChar(char: Char): Boolean = 'a' <= char && char <= 'z' || 'A' <= char && char <= 'Z' || char == '_' || char == '-' 
+        fun isIdentChar(char: Char): Boolean = char in 'a'..'z' || char in 'A'..'Z' || char == '_'
 
-        public fun isDigit(char: Char): Boolean = '0' <= char && char <= '9'
+        fun isDigit(char: Char): Boolean = char in '0'..'9'
     }
 }

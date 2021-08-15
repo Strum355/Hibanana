@@ -1,28 +1,28 @@
 package xyz.noahsc.hibanana.parser
 
+import io.kotest.assertions.withClue
+import io.kotest.matchers.collections.shouldBeEmpty
+import io.kotest.matchers.collections.shouldHaveSize
+import io.kotest.matchers.ints.shouldBeExactly
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions.*;
-import xyz.noahsc.hibanana.token.Token
-import xyz.noahsc.hibanana.token.TokenType
 import xyz.noahsc.hibanana.lexer.Lexer
 import xyz.noahsc.hibanana.ast.*
-import java.util.logging.Logger
 
 class ParserTest {
     @Test
     fun testVarStatement() {
         val input = """
-        var x: int = 5
-        var y: int = 10
+            var x: int = 5
+            var y: int = 10
         """.trimIndent()
 
         val parser = Parser(Lexer(input))
         val program = parser.parse()
 
-        assertNotNull(program)
-        program!! // asserted null, no need for safe checks anymore, but compiler doesnt know that
-
-        assertEquals(2, program.statements.size)
+        parser.errors.shouldBeEmpty()
+        program.statements.shouldHaveSize(2)
 
         val tests = arrayOf("x", "y")
         program.statements.withIndex().forEach { 
@@ -33,36 +33,36 @@ class ParserTest {
     @Test
     fun testVarStatementFail() {
         val input = """
-        var x: int = 5
-        var y int = 10
+            var x: int = 5
+            var y int = 10
         """.trimIndent()
 
         val parser = Parser(Lexer(input))
         parser.parse()
-        assertEquals(1, parser.errors.size)
+        parser.errors.shouldHaveSize(1)
     }
 
-    fun checkVar(statement: Statement, name: String) {
-        assertEquals("var", statement.tokenLiteral())
-        assertTrue(statement is VarStatement)
-        assertEquals(name, (statement as VarStatement).name.value)
-        assertEquals(name, statement.name.tokenLiteral())
+    private fun checkVar(statement: Statement, name: String) {
+        statement.shouldBeInstanceOf<VarStatement>()
+        name shouldBe statement.name.value
+        name shouldBe statement.name.value
     }
 
     @Test
     fun testReturnStatement() {
         val input = """
-        return 5
-        return 123
-        return value
+            return 5
+            return 123
+            return value
         """.trimIndent()
 
-        val parser = Parser(Lexer(input))
-        val program = parser.parse()!!
-        assertEquals(3, program.statements.size)
+        val program = Parser(Lexer(input)).parse()
+        program.statements.size shouldBeExactly 3
 
         program.statements.forEach {
-            assert(it is ReturnStatement, { "each statement must be a return statement" })
+            withClue("each statement must be a return statement") {
+                it.shouldBeInstanceOf<ReturnStatement>()
+            }
         }
     }
 }

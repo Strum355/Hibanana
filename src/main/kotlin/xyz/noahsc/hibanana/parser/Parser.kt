@@ -3,26 +3,29 @@ package xyz.noahsc.hibanana.parser
 import xyz.noahsc.hibanana.ast.*
 import xyz.noahsc.hibanana.token.*
 import xyz.noahsc.hibanana.lexer.*
+import xyz.noahsc.hibanana.token.Token.*
+import kotlin.contracts.ExperimentalContracts
+import kotlin.contracts.contract
 
-public class Parser(private val lexer: Lexer) {
-    // Must be set to lateinit :(
+class Parser(private val lexer: Lexer) {
     private lateinit var currToken: Token
     private var peekToken: Token
-    public val errors: ArrayList<ParserError> = arrayListOf()
+    val errors: ArrayList<ParserError> = arrayListOf()
 
     init {
         peekToken = lexer.nextToken()
         nextToken()
     }
 
-    private fun nextToken() {
+    private fun nextToken(): Token {
         currToken = peekToken
         peekToken = lexer.nextToken()
+        return currToken
     }
 
-    public fun parse(): Program? {
+    fun parse(): Program {
         val program = Program()
-        while(currToken.type != TokenType.EOF) {
+        while(currToken !is EOF) {
             val statement: Statement? = parseStatement()
             if(statement != null) {
                 program.statements.add(statement)
@@ -32,45 +35,50 @@ public class Parser(private val lexer: Lexer) {
         return program
     }
 
-    private fun currTokenIs(t: TokenType) = currToken.type == t
+    @OptIn(ExperimentalContracts::class)
+    private fun Token?.not(): Boolean {
+        contract { returns(false) implies (this@not != null) }
+        return this == null
+    }
 
-    private fun peekTokenIs(t: TokenType) = peekToken.type == t
-
-    private fun expectPeek(t: TokenType): Boolean {
-        if(peekTokenIs(t)) {
+    @OptIn(ExperimentalContracts::class)
+    private inline fun <reified T: Token> Token.expectPeek(): T? {
+        contract { returnsNotNull() implies (this@expectPeek is T) }
+        if(peekToken is T) {
             nextToken()
-            return true
+            return this as T
         }
-        peekError(t)
-        return false
+        peekError<T>()
+        return null
     }
 
-    private fun peekError(t: TokenType) {
+    private inline fun <reified T: Token> peekError() {
         // TODO actual numbers
-        errors.add(ParserError(1, 1, 1, "expected ${t.name}, got ${peekToken.type.name} instead"))
+        errors.add(ParserError(1, 1, 1, "expected ${T::class}, got $peekToken instead"))
     }
 
-    private fun parseStatement() = when(currToken.type) {
-        TokenType.VAR -> parseVar()
-        TokenType.RETURN ->  parseReturn()
+    private fun parseStatement() = when(currToken) {
+        is Var -> parseVar()
+        is Return ->  parseReturn()
         else -> null
     }
 
     private fun parseVar(): VarStatement? {
         val firstToken = currToken
 
-        if(!expectPeek(TokenType.IDENT)) return null
-        
-        val ident = Identifier(currToken.text, currToken)
+        val nextToken = peekToken.expectPeek<Ident>() ?: return null
 
-        if(!expectPeek(TokenType.COLON) && !expectPeek(TokenType.IDENT) && !expectPeek(TokenType.ASSIGN)) return null
+        val ident = Identifier(nextToken.text, nextToken)
+
+        if(peekToken.expectPeek<Colon>().not() && peekToken.expectPeek<Ident>().not() && peekToken.expectPeek<Assign>().not())
+            return null
 
         skipToEnd()
 
         return VarStatement(null, ident, firstToken)
     }
 
-    private fun parseReturn(): ReturnStatement? {
+    private fun parseReturn(): ReturnStatement {
         val firstToken = currToken
 
         nextToken()
@@ -80,7 +88,7 @@ public class Parser(private val lexer: Lexer) {
     }
 
     private fun skipToEnd() {
-        while(!currTokenIs(TokenType.NEWLINE) && !currTokenIs(TokenType.EOF) && !currTokenIs(TokenType.SEMICOLON)) {
+        while(currToken !is Newline && currToken !is EOF && currToken !is Semicolon) {
             nextToken()
         }
     }

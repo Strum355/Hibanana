@@ -1,118 +1,135 @@
 package xyz.noahsc.hibanana.token
 
+import io.kotest.assertions.withClue
+import io.kotest.matchers.shouldBe
+import io.kotest.matchers.types.shouldBeInstanceOf
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions.*;
-import xyz.noahsc.hibanana.token.Token
-import xyz.noahsc.hibanana.token.TokenType
 import xyz.noahsc.hibanana.lexer.Lexer
-import java.util.logging.Logger
 
 class TokenTest {
     @Test
     fun testNextToken() {
         val input = """
-        var x: int = 5
-
-        mut var y: int = 10
-        
-        func trolled(arg: int, otherArg: float): float {
-            return 5 * 8 / otherArg + arg
-        }
-
-        if 55 > 4 {
-            return false
-        } else if 55 != 4 {
-            return true
-        } else {
-            return 1
-        }
+            var x: int = 5
+    
+            mut var y: int = 10
+            
+            func trolled(arg: int, otherArg: float): float {
+                return 5 * 8 / otherArg + arg
+            }
+    
+            if 55 > 4 {
+                return false
+            } else if 55 != 4.5 {
+                return true
+            } else {
+                return 1
+            }
         """.trimIndent()
+
+        val lexer = Lexer(input)
         
         val tests = arrayOf(
-            TokenTest.ExpectedToken(TokenType.VAR, "var"),
-            TokenTest.ExpectedToken(TokenType.IDENT, "x"),
-            TokenTest.ExpectedToken(TokenType.COLON, ":"),
-            TokenTest.ExpectedToken(TokenType.IDENT, "int"),
-            TokenTest.ExpectedToken(TokenType.ASSIGN, "="),
-            TokenTest.ExpectedToken(TokenType.INT, "5"),
-            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
-            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
-            TokenTest.ExpectedToken(TokenType.IDENT, "mut"),
-            TokenTest.ExpectedToken(TokenType.VAR, "var"),
-            TokenTest.ExpectedToken(TokenType.IDENT, "y"),
-            TokenTest.ExpectedToken(TokenType.COLON, ":"),
-            TokenTest.ExpectedToken(TokenType.IDENT, "int"),
-            TokenTest.ExpectedToken(TokenType.ASSIGN, "="),
-            TokenTest.ExpectedToken(TokenType.INT, "10"),
-            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
-            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
-            TokenTest.ExpectedToken(TokenType.FUNCTION, "func"),
-            TokenTest.ExpectedToken(TokenType.IDENT, "trolled"),
-            TokenTest.ExpectedToken(TokenType.LPAREN, "("),
-            TokenTest.ExpectedToken(TokenType.IDENT, "arg"),
-            TokenTest.ExpectedToken(TokenType.COLON, ":"),
-            TokenTest.ExpectedToken(TokenType.IDENT, "int"),
-            TokenTest.ExpectedToken(TokenType.COMMA, ","),
-            TokenTest.ExpectedToken(TokenType.IDENT, "otherArg"),
-            TokenTest.ExpectedToken(TokenType.COLON, ":"),
-            TokenTest.ExpectedToken(TokenType.IDENT, "float"),
-            TokenTest.ExpectedToken(TokenType.RPAREN, ")"),
-            TokenTest.ExpectedToken(TokenType.COLON, ":"),
-            TokenTest.ExpectedToken(TokenType.IDENT, "float"),
-            TokenTest.ExpectedToken(TokenType.LBRACE, "{"),
-            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
-            TokenTest.ExpectedToken(TokenType.RETURN, "return"),
-            TokenTest.ExpectedToken(TokenType.INT, "5"),
-            TokenTest.ExpectedToken(TokenType.ASTERISK, "*"),
-            TokenTest.ExpectedToken(TokenType.INT, "8"),
-            TokenTest.ExpectedToken(TokenType.FSLASH, "/"),
-            TokenTest.ExpectedToken(TokenType.IDENT, "otherArg"),
-            TokenTest.ExpectedToken(TokenType.PLUS, "+"),
-            TokenTest.ExpectedToken(TokenType.IDENT, "arg"),
-            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
-            TokenTest.ExpectedToken(TokenType.RBRACE, "}"),
-            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
-            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
-            TokenTest.ExpectedToken(TokenType.IF, "if"),
-            TokenTest.ExpectedToken(TokenType.INT, "55"),
-            TokenTest.ExpectedToken(TokenType.GT, ">"),
-            TokenTest.ExpectedToken(TokenType.INT, "4"),
-            TokenTest.ExpectedToken(TokenType.LBRACE, "{"),
-            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
-            TokenTest.ExpectedToken(TokenType.RETURN, "return"),
-            TokenTest.ExpectedToken(TokenType.FALSE, "false"),
-            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
-            TokenTest.ExpectedToken(TokenType.RBRACE, "}"),
-            TokenTest.ExpectedToken(TokenType.ELSE, "else"),
-            TokenTest.ExpectedToken(TokenType.IF, "if"),
-            TokenTest.ExpectedToken(TokenType.INT, "55"),
-            TokenTest.ExpectedToken(TokenType.NOT_EQUAL, "!="),
-            TokenTest.ExpectedToken(TokenType.INT, "4"),
-            TokenTest.ExpectedToken(TokenType.LBRACE, "{"),
-            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
-            TokenTest.ExpectedToken(TokenType.RETURN, "return"),
-            TokenTest.ExpectedToken(TokenType.TRUE, "true"),
-            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
-            TokenTest.ExpectedToken(TokenType.RBRACE, "}"),
-            TokenTest.ExpectedToken(TokenType.ELSE, "else"),
-            TokenTest.ExpectedToken(TokenType.LBRACE, "{"),
-            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
-            TokenTest.ExpectedToken(TokenType.RETURN, "return"),
-            TokenTest.ExpectedToken(TokenType.INT, "1"),
-            TokenTest.ExpectedToken(TokenType.NEWLINE, "\n"),
-            TokenTest.ExpectedToken(TokenType.RBRACE, "}"),
-            TokenTest.ExpectedToken(TokenType.EOF, 0.toChar().toString())
+            lexer.expect<Var>(),
+            lexer.expect<Ident>("x"),
+            lexer.expect<Colon>(),
+            lexer.expect<Ident>("int"),
+            lexer.expect<Assign>(),
+            lexer.expect<Number>("5"),
+            lexer.expect<Newline>(),
+            lexer.expect<Newline>(),
+            lexer.expect<Mut>(),
+            lexer.expect<Var>(),
+            lexer.expect<Ident>("y"),
+            lexer.expect<Colon>(),
+            lexer.expect<Ident>("int"),
+            lexer.expect<Assign>(),
+            lexer.expect<Number>("10"),
+            lexer.expect<Newline>(),
+            lexer.expect<Newline>(),
+            lexer.expect<Function>(),
+            lexer.expect<Ident>("trolled"),
+            lexer.expect<LeftParen>(),
+            lexer.expect<Ident>("arg"),
+            lexer.expect<Colon>(),
+            lexer.expect<Ident>("int"),
+            lexer.expect<Comma>(),
+            lexer.expect<Ident>("otherArg"),
+            lexer.expect<Colon>(),
+            lexer.expect<Ident>("float"),
+            lexer.expect<RightParen>(),
+            lexer.expect<Colon>(),
+            lexer.expect<Ident>("float"),
+            lexer.expect<LeftBrace>(),
+            lexer.expect<Newline>(),
+            lexer.expect<Return>(),
+            lexer.expect<Number>("5"),
+            lexer.expect<Asterisk>(),
+            lexer.expect<Number>("8"),
+            lexer.expect<ForwardSlash>(),
+            lexer.expect<Ident>("otherArg"),
+            lexer.expect<Plus>(),
+            lexer.expect<Ident>("arg"),
+            lexer.expect<Newline>(),
+            lexer.expect<RightBrace>(),
+            lexer.expect<Newline>(),
+            lexer.expect<Newline>(),
+            lexer.expect<If>(),
+            lexer.expect<Number>("55"),
+            lexer.expect<Gt>(),
+            lexer.expect<Number>("4"),
+            lexer.expect<LeftBrace>(),
+            lexer.expect<Newline>(),
+            lexer.expect<Return>(),
+            lexer.expect<False>(),
+            lexer.expect<Newline>(),
+            lexer.expect<RightBrace>(),
+            lexer.expect<Else>(),
+            lexer.expect<If>(),
+            lexer.expect<Number>("55"),
+            lexer.expect<NotEqual>(),
+            lexer.expect<Number>("4"),
+            lexer.expect<Dot>(),
+            lexer.expect<Number>("5"),
+            lexer.expect<LeftBrace>(),
+            lexer.expect<Newline>(),
+            lexer.expect<Return>(),
+            lexer.expect<True>(),
+            lexer.expect<Newline>(),
+            lexer.expect<RightBrace>(),
+            lexer.expect<Else>(),
+            lexer.expect<LeftBrace>(),
+            lexer.expect<Newline>(),
+            lexer.expect<Return>(),
+            lexer.expect<Number>("1"),
+            lexer.expect<Newline>(),
+            lexer.expect<RightBrace>(),
+            lexer.expect<EOF>()
         )
 
-        val lexed = Lexer(input)
-        
-        tests.forEachIndexed { _, it ->
-            val token = lexed.nextToken()
-            //println("${token.type.toString()} ${token.text} ${it.expectedType} ${it.expectedString}")
-            assertEquals(it.expectedType, token.type)
-            assertEquals(it.expectedString, token.text)
+        tests.forEachIndexed { i, it -> it(i) }
+    }
+
+    private inline fun <reified T: Token> Lexer.expect(): (Int) -> Unit {
+        return {
+            withClue("token number $it") {
+                val token = this.nextToken()
+                withClue("token value $token") {
+                    token.shouldBeInstanceOf<T>()
+                }
+            }
         }
     }
 
-    data class ExpectedToken(public val expectedType:  TokenType, public val expectedString: String)
+    private inline fun <reified T: TokenWithText> Lexer.expect(expected: String): (Int) -> Unit {
+        return {
+            withClue("token number $it") {
+                val token = this.nextToken()
+                withClue("token value $token") {
+                    token.shouldBeInstanceOf<T>()
+                    token.text shouldBe expected
+                }
+            }
+        }
+    }
 }
